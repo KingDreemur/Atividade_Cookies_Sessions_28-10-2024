@@ -1,11 +1,11 @@
-//Importando o Framework
+// Importando o Framework
 const express = require('express');
 
-//cookies e sessions
+// cookies e sessions
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 
-//Iniciar o express
+// Iniciar o express
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -22,14 +22,40 @@ app.listen(3000, () => {
 
 // Página inicial
 app.get('/', (req, res) => {
-  res.send('<h1>Bem-vindo <a href="/login">Login</a> | <a href="/seguro">Usuário Cadastrado[Entrar]</a></h1>');
+  res.send(`
+    <style>
+      body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+      a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+      a:hover { background-color: #0056b3; }
+    </style>
+    <h1>Bem-vindo!</h1>
+    <p><a href="/login">Login</a> | <a href="/seguro">Usuário Cadastrado [Entrar]</a></p>
+  `);
 });
 
 // Página de login
 app.get('/login', (req, res) => {
-  res.send('<form method="POST" action="/login">Usuário: <input type="text" name="username"/><br>Senha: <input type="password" name="password"/><br><button type="submit">Login</button></form> <br><a>Usuário:giovane</br></a><br><a>Senha:senha</br></a>');
+  res.send(`
+    <style>
+      body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+      form { display: inline-block; text-align: left; }
+      label { display: block; margin-top: 10px; }
+      input { width: 100%; padding: 8px; margin-top: 5px; }
+      button { margin-top: 15px; padding: 10px 20px; border: none; background-color: #007bff; color: white; border-radius: 5px; }
+      button:hover { background-color: #0056b3; }
+      .hint { color: gray; font-size: 0.9em; }
+    </style>
+    <h1>Login</h1>
+    <form method="POST" action="/login">
+      <label>Usuário:</label>
+      <input type="text" name="username" required/>
+      <label>Senha:</label>
+      <input type="password" name="password" required/>
+      <button type="submit">Entrar</button>
+    </form>
+    <p class="hint">Dica: Usuário: giovane | Senha: senha</p>
+  `);
 });
-
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -39,20 +65,53 @@ app.post('/login', (req, res) => {
     req.session.user = username;
     res.redirect('/seguro');
   } else {
-    res.send('Usuário não Cadastrado, <a href="/login">Tente novamente</a>');
+    res.send(`
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; color: red; }
+        a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+        a:hover { background-color: #0056b3; }
+      </style>
+      <h1>Usuário não cadastrado!</h1>
+      <p><a href="/login">Tente novamente</a></p>
+    `);
   }
 });
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
-  res.send('Você Deslogou da Sua Conta <a href="/">Voltar à página inicial</a>');
+  res.send(`
+    <style>
+      body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+      a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+      a:hover { background-color: #0056b3; }
+    </style>
+    <h1>Você deslogou da sua conta</h1>
+    <p><a href="/">Voltar à página inicial</a></p>
+  `);
 });
 
 app.get('/seguro', (req, res) => {
   if (req.session.user) {
-    res.send(`<h1>Página Do Usuário Logado</h1><p>Bem-vindo, ${req.session.user}! </p> <p> <a href="/logout">Logout</a> ,ou, <a href="/">Retornar Ao Inicio</a> </p>`);
+    res.send(`
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+        a:hover { background-color: #0056b3; }
+      </style>
+      <h1>Página do Usuário Logado</h1>
+      <p>Bem-vindo, ${req.session.user}!</p>
+      <p><a href="/logout">Logout</a> | <a href="/">Retornar ao início</a></p>
+    `);
   } else {
-    res.send('Acesso negado <a href="/login">Faça login para continuar</a>');
+    res.send(`
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+        a:hover { background-color: #0056b3; }
+      </style>
+      <h1>Acesso negado!</h1>
+      <p><a href="/login">Faça login para continuar</a></p>
+    `);
   }
 });
 
@@ -66,5 +125,14 @@ function authMiddleware(req, res, next) {
 
 // Aplicar o middleware na rota protegida
 app.get('/seguro', authMiddleware, (req, res) => {
-  res.send(`<h1>Página Do Usuário Logado</h1><p>Bem-vindo, ${req.session.user}! </p> <p> <a href="/logout">Logout</a> ,ou, <a href="/">Retornar Ao Inicio</a> </p>`);
+  res.send(`
+    <style>
+      body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+      a { text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+      a:hover { background-color: #0056b3; }
+    </style>
+    <h1>Página do Usuário Logado</h1>
+    <p>Bem-vindo, ${req.session.user}!</p>
+    <p><a href="/logout">Logout</a> | <a href="/">Retornar ao início</a></p>
+  `);
 });
